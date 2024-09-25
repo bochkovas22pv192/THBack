@@ -15,5 +15,5 @@ public class OfferPostAndPutDTO {
     private String title;
     private String description;
     private LocalDate datePublished;
-    private List<byte[]> images;
+    private List<String> images;
 }

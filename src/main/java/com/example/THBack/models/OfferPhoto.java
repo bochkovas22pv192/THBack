@@ -24,4 +24,11 @@ public class OfferPhoto {
     @ManyToOne
     @JoinColumn(name="offer_id")
     private Offer offer;
+
+
+
+    public OfferPhoto(byte[] photo, Offer offer) {
+        this.photo = photo;
+        this.offer = offer;
+    }
 }

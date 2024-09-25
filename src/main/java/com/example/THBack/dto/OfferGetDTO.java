@@ -21,5 +21,5 @@ public class OfferGetDTO {
     private LocalDate datePublished;
     private int likes;
     private int dislikes;
-    private List<byte[]> images;
+    private List<String> images;
 }

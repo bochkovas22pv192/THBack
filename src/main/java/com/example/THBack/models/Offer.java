@@ -38,7 +38,7 @@ public class Offer {
 
     @OneToMany(mappedBy = "offer")
     @ToString.Exclude
-    private Set<OfferRate> offerRate;
+    private Collection<OfferRate> offerRate;
 
     @OneToMany(mappedBy = "offer")
     @ToString.Exclude

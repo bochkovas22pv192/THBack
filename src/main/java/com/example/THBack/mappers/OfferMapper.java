@@ -3,6 +3,7 @@ package com.example.THBack.mappers;
 
 import com.example.THBack.dto.OfferGetDTO;
 import com.example.THBack.dto.OfferPostAndPutDTO;
+import com.example.THBack.dto.OfferRatePutDTO;
 import com.example.THBack.exceptions.EmployeeNotFoundException;
 import com.example.THBack.models.Offer;
 import com.example.THBack.models.OfferPhoto;
@@ -15,10 +16,9 @@ import com.example.THBack.repository.OfferRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.util.Arrays;
+import java.nio.charset.StandardCharsets;
 import java.util.LinkedHashSet;
 import java.util.List;
-import java.util.Base64;
 
 @RequiredArgsConstructor
 @Service
@@ -29,7 +29,7 @@ public class OfferMapper {
     private final OfferPhotoRepository offerRateRepository;
     private final EmployeeRepository employeeRepository;
 
-    public OfferGetDTO ToOfferGetDTO(Offer offer){
+    public OfferGetDTO offerToOfferGetDTO(Offer offer){
         OfferGetDTO offerGetDTO = new OfferGetDTO();
         offerGetDTO.setId(offer.getId());
         offerGetDTO.setTitle(offer.getTitle());
@@ -56,8 +56,7 @@ public class OfferMapper {
 
         List<String> imagesList = new java.util.ArrayList<>(List.of());
         for (OfferPhoto offerPhoto : offer.getOfferPhoto()){
-
-            imagesList.add(Base64.getEncoder().encodeToString(offerPhoto.getPhoto()));
+            imagesList.add(new String(offerPhoto.getPhoto(), StandardCharsets.UTF_8));
         }
         offerGetDTO.setImages(imagesList);
 
@@ -66,7 +65,7 @@ public class OfferMapper {
 
     }
 
-    public Offer FromOfferPostAndPutDTO (OfferPostAndPutDTO offer){
+    public Offer offerFromOfferPostAndPutDTO(OfferPostAndPutDTO offer){
         Offer result = new Offer();
 
         result.setTitle(offer.getTitle());
@@ -79,7 +78,7 @@ public class OfferMapper {
                                                             .orElseThrow(() -> new EmployeeNotFoundException(offer.getAuthorId())));
         for(String photo : offer.getImages()){
             OfferPhoto offerPhoto = new OfferPhoto();
-            offerPhoto.setPhoto(Base64.getEncoder().encode(photo.getBytes()));
+            offerPhoto.setPhoto(photo.getBytes());
             result.getOfferPhoto().add(offerPhoto);
         }
         for(OfferPhoto photo : result.getOfferPhoto()){
@@ -88,7 +87,7 @@ public class OfferMapper {
         return result;
     }
 
-    public OfferPostAndPutDTO toOfferPostAndPutDTO (Offer offer){
+    public OfferPostAndPutDTO offerToOfferPostAndPutDTO(Offer offer){
         OfferPostAndPutDTO result = new OfferPostAndPutDTO();
         result.setTitle(offer.getTitle());
         result.setDescription(offer.getDescription());
@@ -96,12 +95,23 @@ public class OfferMapper {
 
         result.setAuthorId(offer.getAuthor().getId());
 
-        List<String> temp = new java.util.ArrayList<>(List.of());
+        List<String> photoListForResult = new java.util.ArrayList<>(List.of());
         for(OfferPhoto photo : offer.getOfferPhoto()){
-            temp.add(Arrays.toString(Base64.getDecoder().decode(photo.getPhoto())));
+            photoListForResult.add(new String(photo.getPhoto(), StandardCharsets.UTF_8));
         }
-        result.setImages(temp);
+        result.setImages(photoListForResult);
 
+        return result;
+    }
+
+    public OfferRatePutDTO offerRateToOfferRatePutDTO(OfferRate offerRate){
+        OfferRatePutDTO result = new OfferRatePutDTO();
+        result.setType(offerRate.getType());
+        result.setOfferTitle(offerRate.getOffer().getTitle());
+        result.setOfferAuthorName(offerRate.getAuthor().getFirstName() + " " +
+                offerRate.getAuthor().getLastName() + " " +
+                offerRate.getAuthor().getFatherName()
+        );
         return result;
     }
 }

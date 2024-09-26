@@ -18,6 +18,7 @@ public class OfferPhoto {
     @Column(name = "id", nullable = false)
     private Long id;
 
+    @Lob
     @Column(name = "photo")
     private byte[] photo;
 

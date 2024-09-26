@@ -36,11 +36,11 @@ public class Offer {
     @JoinColumn(name="author_id")
     private Employee author;
 
-    @OneToMany(mappedBy = "offer")
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "offer")
     @ToString.Exclude
     private Collection<OfferRate> offerRate;
 
-    @OneToMany(mappedBy = "offer")
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "offer")
     @ToString.Exclude
     private Collection<OfferPhoto> offerPhoto;
 

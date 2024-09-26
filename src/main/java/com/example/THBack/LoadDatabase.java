@@ -54,9 +54,10 @@ class LoadDatabase {
         OfferRate offerRate = new OfferRate(1L, OfferRateType.LIKE, offer, employee2);
         OfferRate offerRate2 = new OfferRate(2L, OfferRateType.DISLIKE, offer3, employee2);
 
-        OfferPhoto photo = new OfferPhoto(1L, HexFormat.of().parseHex("aaaaaaaa"), offer);
-        OfferPhoto photo2 = new OfferPhoto(2L, HexFormat.of().parseHex("bbbbbbbb"), offer);
-        OfferPhoto photo3 = new OfferPhoto(3L, HexFormat.of().parseHex("cccccccc"), offer);
+        OfferPhoto photo = new OfferPhoto(1L, "aaaaaaaa".getBytes(), offer);
+        OfferPhoto photo2 = new OfferPhoto(2L, "bbbbbbbb".getBytes(), offer);
+        OfferPhoto photo3 = new OfferPhoto(3L, "cccccccc".getBytes(), offer);
+        OfferPhoto photo4 = new OfferPhoto(4L, "zzzzzzz".getBytes(), offer2);
 
         repository.save(employee);
         repository.save(employee2);
@@ -67,6 +68,7 @@ class LoadDatabase {
         offerPhotoRepository.save(photo);
         offerPhotoRepository.save(photo2);
         offerPhotoRepository.save(photo3);
+        offerPhotoRepository.save(photo4);
         offerRateRepository.save(offerRate);
         offerRateRepository.save(offerRate2);
         return args -> {

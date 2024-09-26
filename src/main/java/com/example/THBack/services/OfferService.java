@@ -2,13 +2,20 @@ package com.example.THBack.services;
 
 import com.example.THBack.dto.OfferGetDTO;
 import com.example.THBack.dto.OfferPostAndPutDTO;
+import com.example.THBack.dto.OfferRatePutDTO;
 import com.example.THBack.exceptions.EmployeeNotFoundException;
+import com.example.THBack.exceptions.ApprovingYouOwnOfferException;
+import com.example.THBack.exceptions.OfferNotFoundException;
 import com.example.THBack.mappers.OfferMapper;
 import com.example.THBack.models.Employee;
 import com.example.THBack.models.Offer;
+import com.example.THBack.models.OfferPhoto;
+import com.example.THBack.models.OfferRate;
+import com.example.THBack.models.enums.OfferRateType;
 import com.example.THBack.models.enums.OfferState;
 import com.example.THBack.repository.EmployeeRepository;
 import com.example.THBack.repository.OfferPhotoRepository;
+import com.example.THBack.repository.OfferRateRepository;
 import com.example.THBack.repository.OfferRepository;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.EnumUtils;
@@ -16,7 +23,6 @@ import org.springframework.stereotype.Service;
 
 
 import java.util.List;
-import java.util.Optional;
 
 @RequiredArgsConstructor
 @Service
@@ -24,55 +30,96 @@ public class OfferService {
 
     private final OfferRepository offerRepository;
     private final OfferPhotoRepository offerPhotoRepository;
+    private final OfferRateRepository offerRateRepository;
     private final OfferMapper offerMapper;
     private final EmployeeRepository employeeRepository;
 
     public OfferGetDTO getOfferById(Long id){
-        return offerMapper.ToOfferGetDTO(offerRepository.findById(id).orElse(new Offer()));
+        return offerMapper.offerToOfferGetDTO(offerRepository.findById(id).orElse(new Offer()));
     }
 
-    public List<OfferGetDTO> getOfferAll(String type){
-        List<Offer> temp;
-        if (!EnumUtils.isValidEnum(OfferState.class, type)){
-            temp = offerRepository.findAll();
+    public List<OfferGetDTO> getOfferAll(String state){
+        List<Offer> OfferListFromRepository;
+        if (!EnumUtils.isValidEnum(OfferState.class, state)){
+            OfferListFromRepository = offerRepository.findAll();
         }
         else{
-            temp = offerRepository.findByState(OfferState.valueOf(type));
+            OfferListFromRepository = offerRepository.findByState(OfferState.valueOf(state));
         }
         List<OfferGetDTO> result = new java.util.ArrayList<>(List.of());
-        for(Offer offer : temp){
-            result.add(offerMapper.ToOfferGetDTO(offer));
+        for(Offer offer : OfferListFromRepository){
+            result.add(offerMapper.offerToOfferGetDTO(offer));
         }
         return result;
     }
 
-    public List<OfferGetDTO> getOfferAllByUser(Long id, String type){
+    public List<OfferGetDTO> getOfferAllByUser(Long id, String state){
         List<Offer> temp;
-        if (!EnumUtils.isValidEnum(OfferState.class, type)){
+        if (!EnumUtils.isValidEnum(OfferState.class, state)){
             temp = offerRepository.findAllByAuthor(employeeRepository.findById(id).orElseThrow(() -> new EmployeeNotFoundException(id)));
         }
         else{
-            temp = offerRepository.findByStateAndAuthor(OfferState.valueOf(type), employeeRepository.findById(id).orElseThrow(() -> new EmployeeNotFoundException(id)));
+            temp = offerRepository.findByStateAndAuthor(OfferState.valueOf(state), employeeRepository.findById(id).orElseThrow(() -> new EmployeeNotFoundException(id)));
         }
         List<OfferGetDTO> result = new java.util.ArrayList<>(List.of());
         for(Offer offer : temp){
-            result.add(offerMapper.ToOfferGetDTO(offer));
+            result.add(offerMapper.offerToOfferGetDTO(offer));
         }
         return result;
     }
 
     public OfferPostAndPutDTO createOffer(OfferPostAndPutDTO offer){
-        return offerMapper.toOfferPostAndPutDTO(offerRepository.save(offerMapper.FromOfferPostAndPutDTO(offer)));
+        Offer newOffer = offerMapper.offerFromOfferPostAndPutDTO(offer);
+        Offer newOfferReturn = offerRepository.save(offerMapper.offerFromOfferPostAndPutDTO(offer));
+        for(OfferPhoto photo : newOfferReturn.getOfferPhoto()){
+            offerPhotoRepository.save(photo);
+        }
+        return offerMapper.offerToOfferPostAndPutDTO(newOffer);
     }
 
     public  OfferPostAndPutDTO updateOffer(Long id, OfferPostAndPutDTO offer){
-        Offer newOffer = offerMapper.FromOfferPostAndPutDTO(offer);
-        return offerRepository.findById(id).map(oldOffer -> {
+        Offer newOffer = offerMapper.offerFromOfferPostAndPutDTO(offer);
+        Offer oldOffer = offerRepository.findById(id).orElseThrow(() -> new OfferNotFoundException(id));
+        for(OfferPhoto photo : oldOffer.getOfferPhoto()){
+            offerPhotoRepository.deleteById(photo.getId());
+        }
+        newOffer.setId(id);
+        Offer newOfferReturn = offerRepository.save(newOffer);
+        for(OfferPhoto photo : newOffer.getOfferPhoto()){
+            offerPhotoRepository.save(photo);
+        }
 
-            oldOffer.setTitle(newOffer.getTitle());
-            oldOffer.setDescription(newOffer.getDescription());
-            oldOffer.setOfferPhoto(newOffer.getOfferPhoto());
-            return offerMapper.toOfferPostAndPutDTO(offerRepository.save(oldOffer));
-        }).orElseThrow(() -> new EmployeeNotFoundException(id));
+        return offerMapper.offerToOfferPostAndPutDTO(newOffer);
+    }
+
+    public void deleteOffer(Long id){
+        offerRepository.deleteById(id);
+    }
+
+    public OfferPostAndPutDTO updateOfferStatus(Long id, String state, Long adminId){
+        Offer newOffer = offerRepository.findById(id).orElseThrow(() -> new OfferNotFoundException(id));
+        if (adminId.equals(newOffer.getAuthor().getId())){
+            throw new ApprovingYouOwnOfferException();
+        }
+        newOffer.setState(OfferState.valueOf(state));
+        return offerMapper.offerToOfferPostAndPutDTO(offerRepository.save(newOffer));
+    }
+
+    public OfferRatePutDTO updateOfferScore(Long id, String scoreType, Long employeeId){
+        Employee author = employeeRepository.findById(employeeId).orElseThrow(() -> new EmployeeNotFoundException(id));
+        Offer offer = offerRepository.findById(id).orElseThrow(() -> new OfferNotFoundException(id));
+        OfferRate offerRate = offerRateRepository.findByOfferAndAuthor(offer, author);
+
+        if(offerRate == null){
+            OfferRate newOfferRate = new OfferRate();
+            newOfferRate.setOffer(offer);
+            newOfferRate.setAuthor(author);
+            newOfferRate.setType(OfferRateType.valueOf(scoreType));
+
+            return offerMapper.offerRateToOfferRatePutDTO(offerRateRepository.save(newOfferRate));
+        }
+
+        offerRate.setType(OfferRateType.valueOf(scoreType));
+        return offerMapper.offerRateToOfferRatePutDTO(offerRateRepository.save(offerRate));
     }
 }

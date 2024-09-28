@@ -12,21 +12,21 @@ import lombok.*;
 @Setter
 @ToString
 @Entity
-@Table(name ="offer_rate")
+@Table
 public class OfferRate {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id", nullable = false)
+    @Column(nullable = false)
     private Long id;
 
-    @Column(name="type", nullable = false)
+    @Column(nullable = false)
     private OfferRateType type;
 
     @ManyToOne
-    @JoinColumn(name="offer_id")
+    @JoinColumn(name = "offer_id")
     private Offer offer;
 
     @ManyToOne
-    @JoinColumn(name="author_id")
+    @JoinColumn(name = "author_id")
     private Employee author;
 }

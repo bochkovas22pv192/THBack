@@ -11,21 +11,20 @@ import lombok.*;
 @Setter
 @ToString
 @Entity
-@Table(name ="offer_photo")
+@Table(name = "offer_photo")
 public class OfferPhoto {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id", nullable = false)
+    @Column(nullable = false)
     private Long id;
 
     @Lob
-    @Column(name = "photo")
+    @Column
     private byte[] photo;
 
     @ManyToOne
-    @JoinColumn(name="offer_id")
+    @JoinColumn(name = "offer_id")
     private Offer offer;
-
 
 
     public OfferPhoto(byte[] photo, Offer offer) {

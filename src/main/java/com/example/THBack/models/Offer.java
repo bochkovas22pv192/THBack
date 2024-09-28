@@ -13,23 +13,23 @@ import java.util.Set;
 @NoArgsConstructor
 @Data
 @Entity
-@Table(name ="offer")
+@Table
 public class Offer {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id", nullable = false)
+    @Column(nullable = false)
     private Long id;
 
-    @Column(name="title", nullable = false)
+    @Column(nullable = false)
     private String title;
 
-    @Column(name="description", nullable = false)
+    @Column(nullable = false)
     private String description;
 
-    @Column(name="state", nullable = false)
+    @Column(nullable = false)
     private OfferState state;
 
-    @Column(name="date_published", nullable = false)
+    @Column(nullable = false)
     private LocalDate datePublished;
 
     @ManyToOne
@@ -43,6 +43,8 @@ public class Offer {
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "offer")
     @ToString.Exclude
     private Collection<OfferPhoto> offerPhoto;
+
+
 
 
 }

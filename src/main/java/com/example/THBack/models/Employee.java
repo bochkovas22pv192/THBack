@@ -15,42 +15,42 @@ import lombok.*;
 @Setter
 @ToString
 @Entity
-@Table(name ="employee")
+@Table
 public class Employee {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id", nullable = false)
+    @Column(nullable = false)
     private Long id;
 
-    @Column(name="first_name", nullable = false)
+    @Column(nullable = false)
     private String firstName;
 
-    @Column(name="last_name", nullable = false)
+    @Column(nullable = false)
     private String lastName;
 
-    @Column(name="father_name")
+    @Column
     private String fatherName;
 
-    @Column(name="rank", nullable = false)
+    @Column(nullable = false)
     private String rank;
 
-    @Column(name="phone_number", nullable = false)
+    @Column(nullable = false)
     private String phoneNumber;
 
-    @Column(name="birthday", nullable = false)
+    @Column(nullable = false)
     private LocalDate birthday;
 
-    @Column(name="email", nullable = false)
+    @Column(nullable = false)
     private String email;
 
-    @Column(name="telegram", nullable = false)
+    @Column(nullable = false)
     private String telegram;
 
-    @Column(name="work_beginning_date", nullable = false)
+    @Column(nullable = false)
     private LocalDate workBeginningDate;
 
     @Lob
-    @Column(name="photo")
+    @Column
     private byte[] photo;
 
     @OneToMany(mappedBy = "author")

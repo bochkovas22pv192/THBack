@@ -29,7 +29,7 @@ public class OfferMapper {
     private final OfferPhotoRepository offerRateRepository;
     private final EmployeeRepository employeeRepository;
 
-    public OfferGetDTO offerToOfferGetDTO(Offer offer){
+    public OfferGetDTO offerToOfferGetDTO(Offer offer) {
         OfferGetDTO offerGetDTO = new OfferGetDTO();
         offerGetDTO.setId(offer.getId());
         offerGetDTO.setTitle(offer.getTitle());
@@ -38,16 +38,15 @@ public class OfferMapper {
         offerGetDTO.setDatePublished(offer.getDatePublished());
 
         offerGetDTO.setAuthorName(offer.getAuthor().getFirstName() + " "
-                                + offer.getAuthor().getLastName() + " "
-                                + offer.getAuthor().getFatherName());
+                + offer.getAuthor().getLastName() + " "
+                + offer.getAuthor().getFatherName());
 
         int likes = 0;
         int dislikes = 0;
-        for(OfferRate rate : offer.getOfferRate()){
-            if (rate.getType() == OfferRateType.LIKE){
+        for (OfferRate rate : offer.getOfferRate()) {
+            if (rate.getType() == OfferRateType.LIKE) {
                 likes++;
-            }
-            else {
+            } else {
                 dislikes++;
             }
         }
@@ -55,7 +54,7 @@ public class OfferMapper {
         offerGetDTO.setDislikes(dislikes);
 
         List<String> imagesList = new java.util.ArrayList<>(List.of());
-        for (OfferPhoto offerPhoto : offer.getOfferPhoto()){
+        for (OfferPhoto offerPhoto : offer.getOfferPhoto()) {
             imagesList.add(new String(offerPhoto.getPhoto(), StandardCharsets.UTF_8));
         }
         offerGetDTO.setImages(imagesList);
@@ -65,7 +64,7 @@ public class OfferMapper {
 
     }
 
-    public Offer offerFromOfferPostAndPutDTO(OfferPostAndPutDTO offer){
+    public Offer offerFromOfferPostAndPutDTO(OfferPostAndPutDTO offer) {
         Offer result = new Offer();
 
         result.setTitle(offer.getTitle());
@@ -75,19 +74,19 @@ public class OfferMapper {
         result.setOfferPhoto(new LinkedHashSet<OfferPhoto>());
         result.setOfferRate(new LinkedHashSet<OfferRate>());
         result.setAuthor(employeeRepository.findById(offer.getAuthorId())
-                                                            .orElseThrow(() -> new EmployeeNotFoundException(offer.getAuthorId())));
-        for(String photo : offer.getImages()){
+                .orElseThrow(() -> new EmployeeNotFoundException(offer.getAuthorId())));
+        for (String photo : offer.getImages()) {
             OfferPhoto offerPhoto = new OfferPhoto();
             offerPhoto.setPhoto(photo.getBytes());
             result.getOfferPhoto().add(offerPhoto);
         }
-        for(OfferPhoto photo : result.getOfferPhoto()){
+        for (OfferPhoto photo : result.getOfferPhoto()) {
             photo.setOffer(result);
         }
         return result;
     }
 
-    public OfferPostAndPutDTO offerToOfferPostAndPutDTO(Offer offer){
+    public OfferPostAndPutDTO offerToOfferPostAndPutDTO(Offer offer) {
         OfferPostAndPutDTO result = new OfferPostAndPutDTO();
         result.setTitle(offer.getTitle());
         result.setDescription(offer.getDescription());
@@ -96,7 +95,7 @@ public class OfferMapper {
         result.setAuthorId(offer.getAuthor().getId());
 
         List<String> photoListForResult = new java.util.ArrayList<>(List.of());
-        for(OfferPhoto photo : offer.getOfferPhoto()){
+        for (OfferPhoto photo : offer.getOfferPhoto()) {
             photoListForResult.add(new String(photo.getPhoto(), StandardCharsets.UTF_8));
         }
         result.setImages(photoListForResult);
@@ -104,7 +103,7 @@ public class OfferMapper {
         return result;
     }
 
-    public OfferRatePutDTO offerRateToOfferRatePutDTO(OfferRate offerRate){
+    public OfferRatePutDTO offerRateToOfferRatePutDTO(OfferRate offerRate) {
         OfferRatePutDTO result = new OfferRatePutDTO();
         result.setType(offerRate.getType());
         result.setOfferTitle(offerRate.getOffer().getTitle());

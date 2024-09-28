@@ -32,38 +32,42 @@ public class OfferController {
 
 
     @GetMapping("/{id}")
-    OfferGetDTO offerById(@PathVariable Long id) {return service.getOfferById(id);}
+    OfferGetDTO offerById(@PathVariable Long id) {
+        return service.getOfferById(id);
+    }
 
     @GetMapping("/")
     List<OfferGetDTO> offerAll(@RequestBody GetOfferAllType getOfferAllType) {
         return service.getOfferAll(getOfferAllType.type);
     }
+
     @GetMapping("user/{id}")
     List<OfferGetDTO> offerAll(@PathVariable Long id, @RequestBody GetOfferAllType getOfferAllType) {
         return service.getOfferAllByUser(id, getOfferAllType.type);
     }
 
     @PostMapping("/")
-    OfferPostAndPutDTO offerCreate(@RequestBody OfferPostAndPutDTO offer){
+    OfferPostAndPutDTO offerCreate(@RequestBody OfferPostAndPutDTO offer) {
         return service.createOffer(offer);
     }
 
     @PutMapping("/{id}")
-    OfferPostAndPutDTO offerUpdate(@PathVariable Long id, @RequestBody OfferPostAndPutDTO offer){
+    OfferPostAndPutDTO offerUpdate(@PathVariable Long id, @RequestBody OfferPostAndPutDTO offer) {
         return service.updateOffer(id, offer);
     }
+
     @DeleteMapping("/{id}")
-    void offerDelete(@PathVariable Long id){
+    void offerDelete(@PathVariable Long id) {
         service.deleteOffer(id);
     }
 
     @PutMapping("/status/{id}")
-    OfferPostAndPutDTO offerStatusUpdate(@PathVariable Long id, @RequestBody OfferStateUpdateData offerStateUpdateData){
+    OfferPostAndPutDTO offerStatusUpdate(@PathVariable Long id, @RequestBody OfferStateUpdateData offerStateUpdateData) {
         return service.updateOfferStatus(id, offerStateUpdateData.state, offerStateUpdateData.adminId);
     }
 
     @PutMapping("/score/{id}")
-    OfferRatePutDTO offerScoreUpdate(@PathVariable Long id, @RequestBody OfferScoreUpdateData offerScoreUpdateData){
+    OfferRatePutDTO offerScoreUpdate(@PathVariable Long id, @RequestBody OfferScoreUpdateData offerScoreUpdateData) {
         return service.updateOfferScore(id, offerScoreUpdateData.scoreType, offerScoreUpdateData.employeeId);
     }
 

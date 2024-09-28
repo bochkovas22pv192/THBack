@@ -1,99 +1,120 @@
-//package com.example.tasks;
-//
-//
-//import static io.restassured.RestAssured.given;
-//import static org.hamcrest.Matchers.equalTo;
-//import static org.hamcrest.Matchers.hasSize;
-//import static org.junit.Assert.assertThat;
-//
-//import com.example.tasks.models.Task;
-//import com.example.tasks.repository.TaskRepository;
-//import io.restassured.RestAssured;
-//import io.restassured.http.ContentType;
-//
-//import java.time.LocalDate;
-//import java.time.LocalDateTime;
-//import java.time.format.DateTimeFormatter;
-//import java.util.List;
-//
-//import org.hamcrest.MatcherAssert;
-//import org.junit.jupiter.api.AfterAll;
-//import org.junit.jupiter.api.BeforeAll;
-//import org.junit.jupiter.api.BeforeEach;
-//import org.junit.jupiter.api.Test;
-//import org.springframework.beans.factory.annotation.Autowired;
-//import org.springframework.boot.test.context.SpringBootTest;
-//import org.springframework.boot.test.web.server.LocalServerPort;
-//import org.springframework.test.context.DynamicPropertyRegistry;
-//import org.springframework.test.context.DynamicPropertySource;
-//import org.testcontainers.containers.PostgreSQLContainer;
-//
-//
-//@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-//class TaskControllerTest {
-//
-//    @LocalServerPort
-//    private Integer port;
-//
-//    private final DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-//
-//
-//    static PostgreSQLContainer<?> postgres = new PostgreSQLContainer<>(
-//            "postgres:16-alpine"
-//    );
-//
-//    @BeforeAll
-//    static void beforeAll() {
-//        postgres.start();
-//    }
-//
-//    @AfterAll
-//    static void afterAll() {
-//        postgres.stop();
-//    }
-//
-//    @DynamicPropertySource
-//    static void configureProperties(DynamicPropertyRegistry registry) {
-//        registry.add("spring.datasource.url", postgres::getJdbcUrl);
-//        registry.add("spring.datasource.username", postgres::getUsername);
-//        registry.add("spring.datasource.password", postgres::getPassword);
-//    }
-//
-//    @Autowired
-//    TaskRepository taskRepository;
-//
-//    @BeforeEach
-//    void setUp() {
-//        RestAssured.baseURI = "http://localhost:" + port;
-//        taskRepository.deleteAll();
-//    }
-//
-//    @Test
-//    void shouldGetTaskById() {
-//        List<Task> tasks = List.of(
-//                new Task("Petr@mail.ru", "Помыть полы", "Мыть полы", "Высокий", "Petr@mail.ru",
-//                        LocalDate.parse("2025-09-15", dtf),  LocalDateTime.now(), State.NEW, LocalDateTime.now() )
-//        );
-//        taskRepository.saveAll(tasks);
-//
-//        Task[] temp = given()
-//                .contentType(ContentType.JSON)
-//                .when()
-//                .get("/tasks")
-//                .then().extract().body().as(Task[].class);
-//
-//        Task res = given()
-//                .contentType(ContentType.JSON)
-//                .when()
-//                .get("/tasks/"+temp[0].getId())
-//                .then()
-//                .statusCode(200)
-//                .extract().body().as(Task.class);
-//
-//        MatcherAssert.assertThat(res, equalTo(new Task(temp[0].getId(),
-//                "Petr@mail.ru", "Помыть полы", "Мыть полы", "Высокий", "Petr@mail.ru", LocalDate.parse("2025-09-15", dtf),
-//                temp[0].getTimeCreate(), State.NEW, temp[0].getTimeUpdate())));
-//    }
+package com.example.THBack;
+
+
+import static io.restassured.RestAssured.given;
+import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.hasSize;
+import static org.junit.Assert.assertThat;
+
+import com.example.THBack.dto.OfferGetDTO;
+import com.example.THBack.mappers.OfferMapper;
+import com.example.THBack.models.Employee;
+import com.example.THBack.models.Offer;
+import com.example.THBack.models.OfferPhoto;
+import com.example.THBack.models.OfferRate;
+import com.example.THBack.models.enums.OfferState;
+import com.example.THBack.repository.EmployeeRepository;
+import com.example.THBack.repository.OfferRepository;
+
+import io.restassured.RestAssured;
+import io.restassured.http.ContentType;
+
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.HexFormat;
+import java.util.LinkedHashSet;
+import java.util.List;
+
+import org.hamcrest.MatcherAssert;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.web.server.LocalServerPort;
+import org.springframework.test.context.DynamicPropertyRegistry;
+import org.springframework.test.context.DynamicPropertySource;
+import org.testcontainers.containers.PostgreSQLContainer;
+
+
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+class TaskControllerTest {
+
+    @LocalServerPort
+    private Integer port;
+
+    private final DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+
+
+    static PostgreSQLContainer<?> postgres = new PostgreSQLContainer<>(
+            "postgres:16-alpine"
+    );
+
+    @BeforeAll
+    static void beforeAll() {
+        postgres.start();
+    }
+
+    @AfterAll
+    static void afterAll() {
+        postgres.stop();
+    }
+
+    @DynamicPropertySource
+    static void configureProperties(DynamicPropertyRegistry registry) {
+        registry.add("spring.datasource.url", postgres::getJdbcUrl);
+        registry.add("spring.datasource.username", postgres::getUsername);
+        registry.add("spring.datasource.password", postgres::getPassword);
+    }
+
+    @Autowired
+    OfferRepository offerRepository;
+
+    @Autowired
+    EmployeeRepository employeeRepository;
+
+    @Autowired
+    OfferMapper offerMapper;
+
+    @BeforeEach
+    void setUp() {
+        RestAssured.baseURI = "http://localhost:" + port;
+        offerRepository.deleteAll();
+    }
+
+    @Test
+    void shouldGetTaskById() {
+        Employee employee = new Employee("Ivan", "Ivanov", "Ivanovich",
+                "Junior", "88005553535", LocalDate.now(), "Ivan@mail.ru", "Ivan",
+                LocalDate.now(), HexFormat.of().parseHex("e04fd020ea3a6910a2d808002b30309d"));
+        List<Offer> offers = List.of(
+                new Offer(1L, "Помыть полы", "Помыть полы", OfferState.APPROVED,
+                        LocalDate.now(), employee, new LinkedHashSet<OfferRate>(), new LinkedHashSet<OfferPhoto>())
+        );
+        employeeRepository.save(employee);
+        offerRepository.saveAll(offers);
+
+        OfferGetDTO[] temp = given()
+                .contentType("application/json")
+                .body("{\"type\":\"ALL\"}")
+                .when()
+                .get("/api/v1/offer/")
+                .then().statusCode(200)
+                .extract().body().as(OfferGetDTO[].class);
+
+        OfferGetDTO res = given()
+                .contentType(ContentType.JSON)
+                .when()
+                .get("/api/v1/offer/"+temp[0].getId())
+                .then()
+                .statusCode(200)
+                .extract().body().as(OfferGetDTO.class);
+
+        MatcherAssert.assertThat(res, equalTo(offerMapper.offerToOfferGetDTO(new Offer(1L, "Помыть полы", "Помыть полы", OfferState.APPROVED,
+                LocalDate.now(), employee, new LinkedHashSet<OfferRate>(), new LinkedHashSet<OfferPhoto>()))));
+    }
 //
 //    @Test
 //    void shouldCreateTasks() {
@@ -244,4 +265,4 @@
 //        MatcherAssert.assertThat(mess, equalTo("Нет такой задачи."));
 //    }
 //
-//}
+}

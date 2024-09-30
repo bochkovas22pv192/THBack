@@ -53,11 +53,11 @@ public class Employee {
     @Column
     private byte[] photo;
 
-    @OneToMany(mappedBy = "author")
+    @OneToMany(mappedBy = "author", cascade = CascadeType.ALL)
     @ToString.Exclude
     private Set<Offer> offer;
 
-    @OneToMany(mappedBy = "author")
+    @OneToMany(mappedBy = "author", cascade = CascadeType.ALL)
     @ToString.Exclude
     private Set<OfferRate> offerRate;
 

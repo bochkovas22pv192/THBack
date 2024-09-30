@@ -6,7 +6,7 @@ import lombok.*;
 
 import java.time.LocalDate;
 import java.util.Collection;
-import java.util.Set;
+
 
 
 @AllArgsConstructor
@@ -45,6 +45,13 @@ public class Offer {
     private Collection<OfferPhoto> offerPhoto;
 
 
-
-
+    public Offer(String title, String description, OfferState state, LocalDate datePublished, Employee author, Collection<OfferRate> offerRate, Collection<OfferPhoto> offerPhoto) {
+        this.title = title;
+        this.description = description;
+        this.state = state;
+        this.datePublished = datePublished;
+        this.author = author;
+        this.offerRate = offerRate;
+        this.offerPhoto = offerPhoto;
+    }
 }

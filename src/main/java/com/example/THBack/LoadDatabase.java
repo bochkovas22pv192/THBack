@@ -1,4 +1,4 @@
-//package com.example.THBack;
+package com.example.THBack;
 //
 //import com.example.THBack.models.Employee;
 //import com.example.THBack.models.Offer;
@@ -81,3 +81,7 @@
 //
 //}
 //
+
+class LoadDatabase {
+
+}

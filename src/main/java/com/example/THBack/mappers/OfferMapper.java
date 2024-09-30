@@ -13,6 +13,7 @@ import com.example.THBack.models.enums.OfferState;
 import com.example.THBack.repository.EmployeeRepository;
 import com.example.THBack.repository.OfferPhotoRepository;
 import com.example.THBack.repository.OfferRepository;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -22,6 +23,7 @@ import java.util.List;
 
 @RequiredArgsConstructor
 @Service
+@Transactional
 public class OfferMapper {
 
     private final OfferRepository offerRepository;
